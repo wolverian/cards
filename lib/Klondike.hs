@@ -1,7 +1,7 @@
 module Klondike where
 
 import Cards
-import System.Random (RandomGen)
+import System.Random (RandomGen, uniform, uniformR)
 
 type Pile = [Card]
 
@@ -44,4 +44,12 @@ initial g =
         }
 
 genTableau :: (RandomGen g) => g -> Tableau
-genTableau = _
+genTableau =
+    let counts = [1 .. 7]
+     in _
+
+pick :: (RandomGen g) => [a] -> Int -> g -> ((a, [a]), g)
+pick elems len g =
+    let (i, g) = uniformR (0,) g
+        elem = elems !! i
+     in _
