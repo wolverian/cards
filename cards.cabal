@@ -8,7 +8,7 @@ build-type:      Simple
 extra-doc-files: CHANGELOG.md
 
 common warnings
-  ghc-options: -Wall
+  ghc-options: -Wall -Werror=missing-fields
 
 common settings
   ghc-options:        -threaded
@@ -27,5 +27,11 @@ executable cards
 library
   import:          warnings, settings, dependencies
   hs-source-dirs:  lib
-  exposed-modules: Cards
-  build-depends:   base
+  build-depends:
+    , base
+    , random
+    , random-shuffle
+
+  exposed-modules:
+    Cards
+    Klondike

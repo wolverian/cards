@@ -1,12 +1,16 @@
-module Cards (
-    Suit (..),
-    Rank (..),
-    value,
-    Card (..),
-    Deck (..),
-    regularDeck,
-    Hand (..),
-) where
+module Cards
+    ( Suit (..)
+    , Rank (..)
+    , value
+    , Card (..)
+    , Deck (..)
+    , regularDeck
+    , Hand (..)
+    , shuffledDeck
+    ) where
+
+import System.Random (RandomGen)
+import System.Random.Shuffle qualified as Random
 
 data Suit = Diamond | Clubs | Hearts | Spades deriving (Read, Eq, Enum)
 
@@ -43,3 +47,9 @@ regularDeck = Deck [Card suit rank | suit <- [Diamond .. Spades], rank <- [Ace .
 
 newtype Hand = Hand [Card]
     deriving (Show, Read, Eq)
+
+shuffledDeck :: (RandomGen g) => g -> Deck
+shuffledDeck = shuffle regularDeck
+
+shuffle :: (RandomGen g) => Deck -> g -> Deck
+shuffle (Deck cards) g = Deck $ Random.shuffle' cards 52 g
