@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   build:
-    runs-on: buildjet-8vcpu-ubuntu-2204-arm
+    runs-on: buildjet-8vcpu-ubuntu-2204
     container:
       image: ghcr.io/wolverian/ghc-musl:9.6.3
     steps:
