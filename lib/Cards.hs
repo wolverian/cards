@@ -69,4 +69,5 @@ shuffledDeck g =
 
 shuffle :: (RandomGen g, KnownNat n) => Pile n -> g -> Pile n
 shuffle (Pile cards) g =
+    -- todo: write a shuffle for sized vectors
     Pile $ fromJust $ Sized.fromList $ Random.shuffle' (Sized.toList cards) (length cards) g
