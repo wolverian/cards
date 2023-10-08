@@ -1,4 +1,6 @@
 module Main where
 
+import Cards qualified
+
 main :: IO ()
-main = putStrLn "Hello, Haskell!"
+main = print Cards.regularDeck
