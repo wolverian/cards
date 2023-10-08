@@ -57,7 +57,7 @@ regularDeck =
         . fromJust
         $ Sized.fromListN [Card suit rank | suit <- [Diamond .. Spades], rank <- [Ace .. King]] -- consider writing this in terms of sized vectors
 
-newtype Hand = Hand [Card]
+newtype Hand n = Hand (Sized.Vector n Card)
     deriving (Show, Read, Eq)
 
 shuffledDeck :: (RandomGen g) => g -> Deck
