@@ -18,7 +18,9 @@ common settings
     DataKinds
     DeriveAnyClass
     DerivingStrategies
+    ExplicitNamespaces
     LambdaCase
+    ViewPatterns
 
 common dependencies
   build-depends: base
@@ -36,6 +38,7 @@ library
     , base
     , random
     , random-shuffle
+    , vector
     , vector-sized
 
   exposed-modules:
