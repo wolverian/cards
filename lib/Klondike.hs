@@ -1,7 +1,7 @@
 module Klondike where
 
 import Cards
-import System.Random (RandomGen, uniform, uniformR)
+import System.Random (RandomGen (split), uniform, uniformR)
 
 type Pile = [Card]
 
@@ -35,7 +35,8 @@ data Game g = Game
 
 initial :: (RandomGen g) => g -> Game g
 initial g =
-    let (deck, g') = shuffledDeck g
+    let (g', g'') = split g
+        deck = shuffledDeck g''
      in Game
             { waste = Waste []
             , foundations = Foundations [[], [], [], []]
