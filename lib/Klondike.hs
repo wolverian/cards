@@ -56,22 +56,23 @@ initial :: (RandomGen g) => g -> Game g
 initial g =
     let (g', g'') = split g
         deck = shuffledDeck g''
+        (stock, tableau) = genTableau deck
      in Game
-            { waste = Waste mempty
+            { waste = mempty
             , foundations = mempty
-            , stock = fromDeck (shuffledDeck g)
-            , tableau = genTableau deck
             , randomGen = g'
+            , stock
+            , tableau
             }
 
-genTableau :: Deck -> Tableau
+genTableau :: Deck -> (Stock, Tableau)
 genTableau (Deck cards) =
     let counts = [1 .. 7] :: [Int]
-        ([], columns) =
+        (rest, columns) =
             foldr
                 ( \n (cards', columns') ->
-                    let (column, rest) = splitAt n cards' in (rest, column : columns')
+                    let (column, rest') = splitAt n cards' in (rest', column : columns')
                 )
                 (Sized.toList cards, mempty)
                 counts
-     in Tableau (Unsized.fromList <$> fromJust (Sized.fromList columns))
+     in (Stock (Unsized.fromList rest), Tableau (Unsized.fromList <$> fromJust (Sized.fromList columns)))
