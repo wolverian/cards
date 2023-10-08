@@ -15,7 +15,7 @@ import Prelude hiding (replicate)
 import Data.Maybe (fromJust)
 import Data.Vector qualified as Unsized
 import Data.Vector.Sized qualified as Sized
-import System.Random (RandomGen (split))
+import System.Random (RandomGen)
 
 import Cards (Card, Deck (..), shuffledDeck)
 
@@ -43,38 +43,37 @@ newtype Foundations = Foundations (Sized.Vector 4 Pile)
     deriving stock (Show)
     deriving newtype (Semigroup, Monoid)
 
-data Game g = Game
+data Game = Game
     { tableau :: Tableau
     , stock :: Stock
     , waste :: Waste
     , foundations :: Foundations
-    , randomGen :: g
     }
     deriving (Show)
 
-initial :: (RandomGen g) => g -> Game g
+initial :: (RandomGen g) => g -> Game
 initial g =
-    let (g', g'') = split g
-        deck = shuffledDeck g''
+    let deck = shuffledDeck g
         (stock, tableau) = genTableau deck
      in Game
             { waste = mempty
             , foundations = mempty
-            , randomGen = g'
             , stock
             , tableau
             }
 
 genTableau :: Deck -> (Stock, Tableau)
 genTableau (Deck cards) =
-    let counts = [1 .. 7] :: [Int]
+    let counts = [1 .. 7]
         (rest, columns) =
             foldr
                 ( \n (cards', columns') ->
-                    let (column, rest') = splitAt n cards' in (rest', column : columns')
+                    let (column, rest') = splitAt n cards'
+                     in (rest', column : columns')
                 )
                 (Sized.toList cards, mempty)
                 counts
-     in let trustMeBro = fromJust $ Sized.fromList columns
-            columns' = Unsized.fromList <$> trustMeBro
-         in (Stock (Unsized.fromList rest), Tableau columns')
+        trustMeBro = fromJust $ Sized.fromList columns
+        tableau = Unsized.fromList <$> trustMeBro
+        stock = Unsized.fromList rest
+     in (Stock stock, Tableau tableau)
