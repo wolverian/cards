@@ -10,8 +10,6 @@ module Klondike
     , genTableau
     ) where
 
-import Prelude hiding (replicate)
-
 import Data.Maybe (fromJust)
 import Data.Vector qualified as Unsized
 import Data.Vector.Sized qualified as Sized
