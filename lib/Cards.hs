@@ -9,6 +9,8 @@ module Cards
     , shuffledDeck
     ) where
 
+import Data.Bifunctor (Bifunctor (bimap, first))
+import Data.List (unfoldr)
 import System.Random (RandomGen)
 import System.Random.Shuffle qualified as Random
 
@@ -48,8 +50,16 @@ regularDeck = Deck [Card suit rank | suit <- [Diamond .. Spades], rank <- [Ace .
 newtype Hand = Hand [Card]
     deriving (Show, Read, Eq)
 
-shuffledDeck :: (RandomGen g) => g -> Deck
-shuffledDeck = shuffle regularDeck
+shuffledDeck :: (RandomGen g) => g -> (Deck, g)
+shuffledDeck =
+    let Deck cards = regularDeck
+     in first Deck . shuffle cards
 
-shuffle :: (RandomGen g) => Deck -> g -> Deck
-shuffle (Deck cards) g = Deck $ Random.shuffle' cards 52 g
+shuffle :: (RandomGen g) => [Card] -> g -> ([Card], g)
+shuffle cards g =
+    let (idx, g') = genIndices [0 .. 51] g
+        cards' = Random.shuffle cards idx
+     in (cards', g')
+  where
+    genIndices :: [Int] -> g -> ([Int], g)
+    genIndices l g = _

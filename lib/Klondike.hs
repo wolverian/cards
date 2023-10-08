@@ -35,21 +35,16 @@ data Game g = Game
 
 initial :: (RandomGen g) => g -> Game g
 initial g =
-    Game
-        { waste = Waste []
-        , foundations = Foundations [[], [], [], []]
-        , stock = fromDeck (shuffledDeck g)
-        , tableau = genTableau g
-        , randomGen = g
-        }
+    let (deck, g') = shuffledDeck g
+     in Game
+            { waste = Waste []
+            , foundations = Foundations [[], [], [], []]
+            , stock = fromDeck (shuffledDeck g)
+            , tableau = genTableau deck
+            , randomGen = g'
+            }
 
-genTableau :: (RandomGen g) => g -> Tableau
-genTableau =
+genTableau :: Deck -> Tableau
+genTableau g =
     let counts = [1 .. 7]
-     in _
-
-pick :: (RandomGen g) => [a] -> Int -> g -> ((a, [a]), g)
-pick elems len g =
-    let (i, g) = uniformR (0,) g
-        elem = elems !! i
-     in _
+     in (Tableau _, g)
