@@ -13,7 +13,12 @@ common warnings
 common settings
   ghc-options:        -threaded
   default-language:   GHC2021
-  default-extensions: LambdaCase
+  default-extensions:
+    BlockArguments
+    DataKinds
+    DeriveAnyClass
+    DerivingStrategies
+    LambdaCase
 
 common dependencies
   build-depends: base
@@ -31,6 +36,7 @@ library
     , base
     , random
     , random-shuffle
+    , vector-sized
 
   exposed-modules:
     Cards

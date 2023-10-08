@@ -7,14 +7,20 @@ module Cards
     , regularDeck
     , Hand (..)
     , shuffledDeck
+    , shuffle
     ) where
 
-import Data.Bifunctor (Bifunctor (bimap, first))
-import Data.List (unfoldr)
+import Data.Maybe (fromJust)
+import Data.Vector.Sized (Vector, fromList, fromListN, toList)
+import GHC.Generics (Generic)
+import GHC.TypeLits (KnownNat)
 import System.Random (RandomGen)
+import System.Random qualified as Random
 import System.Random.Shuffle qualified as Random
 
-data Suit = Diamond | Clubs | Hearts | Spades deriving (Read, Eq, Enum)
+data Suit = Diamond | Clubs | Hearts | Spades
+    deriving (Read, Eq, Enum, Generic)
+    deriving anyclass (Random.Finite)
 
 instance Show Suit where
     show :: Suit -> String
@@ -25,7 +31,8 @@ instance Show Suit where
         Spades -> "♠"
 
 data Rank = Ace | Two | Three | Four | Five | Six | Seven | Eight | Nine | Ten | Jack | Queen | King
-    deriving (Read, Eq, Ord, Enum)
+    deriving (Read, Eq, Ord, Enum, Generic)
+    deriving anyclass (Random.Finite)
 
 instance Show Rank where
     show :: Rank -> String
@@ -35,31 +42,31 @@ value :: Rank -> Int
 value = (+ 1) . fromEnum
 
 data Card = Card Suit Rank
-    deriving (Read, Eq)
+    deriving (Read, Eq, Generic)
+    deriving anyclass (Random.Finite)
 
 instance Show Card where
     show :: Card -> String
     show (Card suit rank) = show suit ++ " " ++ show rank
 
-newtype Deck = Deck [Card]
-    deriving (Show, Read, Eq)
+newtype Deck = Deck (Vector 52 Card)
+    deriving (Show, Read, Eq, Generic)
+
+newtype Pile n = Pile (Vector n Card)
+    deriving (Show, Read, Eq, Generic)
 
 regularDeck :: Deck
-regularDeck = Deck [Card suit rank | suit <- [Diamond .. Spades], rank <- [Ace .. King]]
+regularDeck = Deck $ fromJust $ fromListN [Card suit rank | suit <- [Diamond .. Spades], rank <- [Ace .. King]]
 
 newtype Hand = Hand [Card]
     deriving (Show, Read, Eq)
 
-shuffledDeck :: (RandomGen g) => g -> (Deck, g)
-shuffledDeck =
+shuffledDeck :: (RandomGen g) => g -> Deck
+shuffledDeck g =
     let Deck cards = regularDeck
-     in first Deck . shuffle cards
+        Pile cards' = shuffle (Pile cards) g
+     in Deck cards'
 
-shuffle :: (RandomGen g) => [Card] -> g -> ([Card], g)
-shuffle cards g =
-    let (idx, g') = genIndices [0 .. 51] g
-        cards' = Random.shuffle cards idx
-     in (cards', g')
-  where
-    genIndices :: [Int] -> g -> ([Int], g)
-    genIndices l g = _
+shuffle :: (RandomGen g, KnownNat n) => Pile n -> g -> Pile n
+shuffle (Pile cards) g =
+    Pile $ fromJust $ fromList $ Random.shuffle' (toList cards) (length cards) g
