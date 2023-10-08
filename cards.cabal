@@ -25,10 +25,13 @@ common settings
 common dependencies
   build-depends: base
 
-executable cards
+executable cards-exe
   import:         warnings, settings, dependencies
   main-is:        Main.hs
-  build-depends:  cards
+  build-depends:
+    , cards
+    , random
+
   hs-source-dirs: app
 
 library
