@@ -75,4 +75,6 @@ genTableau (Deck cards) =
                 )
                 (Sized.toList cards, mempty)
                 counts
-     in (Stock (Unsized.fromList rest), Tableau (Unsized.fromList <$> fromJust (Sized.fromList columns)))
+     in let trustMeBro = fromJust $ Sized.fromList columns
+            columns' = Unsized.fromList <$> trustMeBro
+         in (Stock (Unsized.fromList rest), Tableau columns')
