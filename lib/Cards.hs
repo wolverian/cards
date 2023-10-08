@@ -11,7 +11,7 @@ module Cards
     ) where
 
 import Data.Maybe (fromJust)
-import Data.Vector.Sized (Vector, fromList, fromListN, toList)
+import Data.Vector.Sized qualified as Sized
 import GHC.Generics (Generic)
 import GHC.TypeLits (KnownNat)
 import System.Random (RandomGen)
@@ -49,14 +49,14 @@ instance Show Card where
     show :: Card -> String
     show (Card suit rank) = show suit ++ " " ++ show rank
 
-newtype Deck = Deck (Vector 52 Card)
+newtype Deck = Deck (Sized.Vector 52 Card)
     deriving (Show, Read, Eq, Generic)
 
-newtype Pile n = Pile (Vector n Card)
+newtype Pile n = Pile (Sized.Vector n Card)
     deriving (Show, Read, Eq, Generic)
 
 regularDeck :: Deck
-regularDeck = Deck $ fromJust $ fromListN [Card suit rank | suit <- [Diamond .. Spades], rank <- [Ace .. King]]
+regularDeck = Deck $ fromJust $ Sized.fromListN [Card suit rank | suit <- [Diamond .. Spades], rank <- [Ace .. King]]
 
 newtype Hand = Hand [Card]
     deriving (Show, Read, Eq)
@@ -69,4 +69,4 @@ shuffledDeck g =
 
 shuffle :: (RandomGen g, KnownNat n) => Pile n -> g -> Pile n
 shuffle (Pile cards) g =
-    Pile $ fromJust $ fromList $ Random.shuffle' (toList cards) (length cards) g
+    Pile $ fromJust $ Sized.fromList $ Random.shuffle' (Sized.toList cards) (length cards) g

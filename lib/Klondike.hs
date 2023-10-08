@@ -1,18 +1,27 @@
-module Klondike where
+module Klondike
+    ( Pile
+    , Tableau (..)
+    , Stock (..)
+    , FromDeck (..)
+    , Waste (..)
+    , Foundations (..)
+    , Game (..)
+    , initial
+    , genTableau
+    ) where
 
-import Cards (Card, Deck (..), shuffledDeck)
-import Data.Data (Proxy (Proxy))
+import Prelude hiding (replicate)
+
 import Data.Maybe (fromJust)
 import Data.Vector qualified as Unsized
-import Data.Vector.Sized (Vector, enumFromN', fromSized, take', toList, toSized, unfoldrN)
 import Data.Vector.Sized qualified as Sized
-import GHC.TypeLits (KnownNat, SNat, type (+))
 import System.Random (RandomGen (split))
-import Prelude hiding (replicate)
+
+import Cards (Card, Deck (..), shuffledDeck)
 
 type Pile = Unsized.Vector Card
 
-newtype Tableau = Tableau (Vector 7 Pile)
+newtype Tableau = Tableau (Sized.Vector 7 Pile)
     deriving (Show)
 
 newtype Stock = Stock Pile
@@ -24,13 +33,13 @@ class FromDeck f where
 
 instance FromDeck Stock where
     fromDeck :: Deck -> Stock
-    fromDeck (Deck cards) = Stock (fromSized cards)
+    fromDeck (Deck cards) = Stock (Sized.fromSized cards)
 
 newtype Waste = Waste Pile
     deriving (Show)
     deriving newtype (Semigroup, Monoid)
 
-newtype Foundations = Foundations (Vector 4 Pile)
+newtype Foundations = Foundations (Sized.Vector 4 Pile)
     deriving stock (Show)
     deriving newtype (Semigroup, Monoid)
 
@@ -60,9 +69,9 @@ genTableau (Deck cards) =
     let counts = [1 .. 7] :: [Int]
         ([], columns) =
             foldr
-                ( \n (cards', columns) ->
-                    let (column, rest) = splitAt n cards' in (rest, column : columns)
+                ( \n (cards', columns') ->
+                    let (column, rest) = splitAt n cards' in (rest, column : columns')
                 )
-                (toList cards, mempty)
+                (Sized.toList cards, mempty)
                 counts
      in Tableau (Unsized.fromList <$> fromJust (Sized.fromList columns))
