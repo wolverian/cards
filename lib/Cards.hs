@@ -1,6 +1,8 @@
 module Cards
     ( Suit (..)
+    , suits
     , Rank (..)
+    , ranks
     , value
     , Card (..)
     , Deck (..)
@@ -18,7 +20,7 @@ import System.Random (RandomGen)
 import System.Random.Shuffle qualified as Random
 
 data Suit = Diamond | Clubs | Hearts | Spades
-    deriving (Read, Eq, Enum, Generic)
+    deriving (Read, Eq, Enum, Bounded, Generic)
 
 instance Show Suit where
     show :: Suit -> String
@@ -29,7 +31,7 @@ instance Show Suit where
         Spades -> "♠"
 
 data Rank = Ace | Two | Three | Four | Five | Six | Seven | Eight | Nine | Ten | Jack | Queen | King
-    deriving (Read, Eq, Ord, Enum, Generic)
+    deriving (Read, Eq, Ord, Enum, Bounded, Generic)
 
 instance Show Rank where
     show :: Rank -> String
@@ -53,9 +55,14 @@ newtype Pile n = Pile (Sized.Vector n Card)
 
 regularDeck :: Deck
 regularDeck =
-    Deck
-        . fromJust
-        $ Sized.fromListN [Card suit rank | suit <- [Diamond .. Spades], rank <- [Ace .. King]] -- consider writing this in terms of sized vectors
+    Deck $
+        Sized.concatMap (\suit -> Sized.map (Card suit) ranks) suits
+
+suits :: Sized.Vector 4 Suit
+suits = Sized.iterateN succ minBound
+
+ranks :: Sized.Vector 13 Rank
+ranks = Sized.iterateN succ minBound
 
 newtype Hand n = Hand (Sized.Vector n Card)
     deriving (Show, Read, Eq)
