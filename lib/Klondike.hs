@@ -31,7 +31,7 @@ class FromDeck f where
 
 instance FromDeck Stock where
     fromDeck :: Deck -> Stock
-    fromDeck (Deck cards) = Stock (Sized.fromSized cards)
+    fromDeck (Deck cards) = Stock $ Sized.fromSized cards
 
 newtype Waste = Waste Pile
     deriving (Show)
