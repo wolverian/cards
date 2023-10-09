@@ -63,6 +63,7 @@ genTableau (Deck cards) =
                 )
                 (Sized.toList cards, mempty)
                 counts
+        -- fixme: figure out how to do this with sized vectors
         trustMeBro = fromJust $ Sized.fromList columns
         tableau = Unsized.fromList <$> trustMeBro
         stock = Unsized.fromList rest
