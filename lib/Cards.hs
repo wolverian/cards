@@ -40,7 +40,7 @@ instance Show Rank where
     show = show . value
 
 value :: Rank -> Int
-value = (+ 1) . fromEnum
+value = succ . fromEnum
 
 data Card = Card Suit Rank
     deriving (Read, Eq, Generic)
