@@ -49,6 +49,7 @@ data Game = Game
     }
     deriving (Show)
 
+-- todo: maybe it would be better to just take in the shuffled deck as a parameter? do games have different shuffling rules?
 initial :: (RandomGen g) => g -> Game
 initial g =
     let deck = shuffledDeck g
