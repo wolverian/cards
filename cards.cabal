@@ -37,7 +37,6 @@ library
   import:          warnings, settings, dependencies
   hs-source-dirs:  lib
   build-depends:
-    , base
     , finite-typelits
     , random
     , random-shuffle
