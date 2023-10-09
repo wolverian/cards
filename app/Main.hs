@@ -1,8 +1,9 @@
 module Main where
 
+import System.Random qualified as Random
+
 import Cards qualified
 import Klondike qualified
-import System.Random qualified as Random
 
 data Game = Game
     deriving (Show)
@@ -10,6 +11,5 @@ data Game = Game
 main :: IO ()
 main = do
     print Cards.regularDeck
-    g <- Random.initStdGen
-    print $ Cards.shuffledDeck g
-    print $ Klondike.initial g
+    deck <- Cards.shuffledDeck <$> Random.initStdGen
+    print $ Klondike.newGame deck

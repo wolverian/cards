@@ -5,15 +5,14 @@ module Klondike
     , Waste (..)
     , Foundations (..)
     , Game (..)
-    , initial
+    , newGame
     ) where
 
 import Data.Maybe (fromJust)
 import Data.Vector qualified as Unsized
 import Data.Vector.Sized qualified as Sized
-import System.Random (RandomGen)
 
-import Cards (Card, Deck (..), shuffledDeck)
+import Cards (Card, Deck (..))
 
 type Pile = Unsized.Vector Card
 
@@ -40,11 +39,9 @@ data Game = Game
     }
     deriving (Show)
 
--- todo: maybe it would be better to just take in the shuffled deck as a parameter? do games have different shuffling rules?
-initial :: (RandomGen g) => g -> Game
-initial g =
-    let deck = shuffledDeck g
-        (stock, tableau) = genTableau deck
+newGame :: Deck -> Game
+newGame deck =
+    let (stock, tableau) = genTableau deck
      in Game
             { waste = mempty
             , foundations = mempty
