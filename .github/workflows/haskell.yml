@@ -51,6 +51,6 @@ jobs:
           path: ${{ steps.cabal.outputs.store }}
           key: ${{ steps.cache.outputs.cache-primary-key }}
       - name: Build
-        run: cabal build --enable-tests --enable-benchmarks all
+        run: cabal build all --enable-tests --enable-benchmarks
       - name: Check the executable runs
         run: cabal run
