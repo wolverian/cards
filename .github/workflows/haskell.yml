@@ -26,7 +26,7 @@ jobs:
         run: |
           echo "version=$(cabal --numeric-version)" >> "$GITHUB_OUTPUT"
           # there doesn't seem to be a way to ask cabal what the store path is
-          echo "store=~/.cache/cabal/store" >> "$GITHUB_OUTPUT"
+          echo "store=~/.cache/cabal" >> "$GITHUB_OUTPUT"
       - name: Configure the build
         run: |
           cabal update
