@@ -39,6 +39,7 @@ instance Show Rank where
     show :: Rank -> String
     show = show . value
 
+-- fixme: this should be game specific
 value :: Rank -> Int
 value = succ . fromEnum
 
