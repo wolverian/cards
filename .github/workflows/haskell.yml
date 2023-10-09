@@ -31,7 +31,7 @@ jobs:
           key: ${{ runner.os }}-${{ runner.arch }}-ghc-${{ matrix.ghc }}-cabal
         with:
           path: ~/.cache/cabal
-          key: ${{ env.key }}-cabal-${{ hashFiles('*.cabal', 'cabal.project', 'cabal.project.freeze') }}
+          key: ${{ env.key }}-${{ hashFiles('*.cabal', 'cabal.project', 'cabal.project.freeze') }}
           restore-keys: ${{ env.key }}-
       - name: Install dependencies
         run: |
