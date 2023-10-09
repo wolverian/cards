@@ -2,12 +2,10 @@ module Klondike
     ( Pile
     , Tableau (..)
     , Stock (..)
-    , FromDeck (..)
     , Waste (..)
     , Foundations (..)
     , Game (..)
     , initial
-    , genTableau
     ) where
 
 import Data.Maybe (fromJust)
@@ -25,13 +23,6 @@ newtype Tableau = Tableau (Sized.Vector 7 Pile)
 newtype Stock = Stock Pile
     deriving (Show)
     deriving newtype (Semigroup, Monoid)
-
-class FromDeck f where
-    fromDeck :: Deck -> f
-
-instance FromDeck Stock where
-    fromDeck :: Deck -> Stock
-    fromDeck (Deck cards) = Stock $ Sized.fromSized cards
 
 newtype Waste = Waste Pile
     deriving (Show)
