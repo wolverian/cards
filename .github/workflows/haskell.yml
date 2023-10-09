@@ -25,36 +25,19 @@ jobs:
       image: ghcr.io/wolverian/ghc-musl:${{ matrix.ghc }}
     steps:
       - uses: actions/checkout@v3
-      - name: Get Cabal version
-        id: cabal
-        run: |
-          echo "version=$(cabal --numeric-version)" >> "$GITHUB_OUTPUT"
-          # there doesn't seem to be a way to ask cabal what the store path is
-          echo "store=~/.cache/cabal" >> "$GITHUB_OUTPUT"
-      - name: Configure the build
-        run: |
-          cabal update
-          cabal configure --enable-tests --enable-benchmarks --disable-documentation
-          cabal build --dry-run
-      - name: Restore cached dependencies
-        uses: buildjet/cache/restore@v3
-        id: cache
+      - name: Cache
+        uses: buildjet/cache@v3
         env:
-          key: ${{ runner.os }}-${{ runner.arch }}-ghc-${{ matrix.ghc }}-cabal-${{ steps.cabal.outputs.version }}
+          key: ${{ runner.os }}-${{ runner.arch }}-ghc-${{ matrix.ghc }}-cabal
         with:
-          path: ${{ steps.cabal.outputs.store }}
-          key: ${{ env.key }}-plan-${{ hashFiles('**/plan.json') }}
+          path: ~/.cache/cabal
+          key: ${{ env.key }}-cabal-${{ hashFiles('*.cabal', 'cabal.project', 'cabal.project.freeze') }}
           restore-keys: ${{ env.key }}-
       - name: Install dependencies
-        run: cabal build all --only-dependencies
-      - name: Save cached dependencies
-        uses: buildjet/cache/save@v3
-        # Caches are immutable, trying to save with the same key would error.
-        # if: ${{ steps.cache.outputs.cache-primary-key != steps.cache.outputs.cache-matched-key }}
-        with:
-          path: ${{ steps.cabal.outputs.store }}
-          key: ${{ steps.cache.outputs.cache-primary-key }}
-      - name: Build
-        run: cabal build all --enable-tests --enable-benchmarks
+        run: |
+          cabal update
+          cabal build all --only-dependencies
+      - name: Build executable
+        run: cabal build all
       - name: Check the executable runs
         run: cabal run
