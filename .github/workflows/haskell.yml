@@ -29,6 +29,7 @@ jobs:
           echo "store=~/.cache/cabal/store" >> "$GITHUB_OUTPUT"
       - name: Configure the build
         run: |
+          cabal update
           cabal configure --enable-tests --enable-benchmarks --disable-documentation
           cabal build --dry-run
       - name: Restore cached dependencies
