@@ -10,6 +10,8 @@ module Cards
     , Hand (..)
     , shuffledDeck
     , shuffle
+    , cardsOfRank
+    , cardsOfSuit
     ) where
 
 import Data.Maybe (fromJust)
@@ -54,9 +56,13 @@ newtype Pile n = Pile (Sized.Vector n Card)
     deriving (Show, Read, Eq, Generic)
 
 regularDeck :: Deck
-regularDeck =
-    Deck $
-        Sized.concatMap (\suit -> Sized.map (Card suit) ranks) suits
+regularDeck = Deck $ Sized.concatMap cardsOfSuit suits
+
+cardsOfSuit :: Suit -> Sized.Vector 13 Card
+cardsOfSuit suit = Sized.map (Card suit) ranks
+
+cardsOfRank :: Rank -> Sized.Vector 4 Card
+cardsOfRank rank = Sized.map (`Card` rank) suits
 
 suits :: Sized.Vector 4 Suit
 suits = Sized.iterateN succ minBound
