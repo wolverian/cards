@@ -12,26 +12,43 @@ permissions:
 
 jobs:
   build:
+    strategy:
+      matrix:
+        ghc:
+          - "9.6.3"
     runs-on: buildjet-8vcpu-ubuntu-2204
     container:
-      image: ghcr.io/wolverian/ghc-musl:9.6.3
+      image: ghcr.io/wolverian/ghc-musl:${{ matrix.ghc }}
     steps:
       - uses: actions/checkout@v3
-      - name: Cache
-        uses: buildjet/cache@v3
-        env:
-          cache-name: cache-cabal
-        with:
-          path: ~/.cache/cabal
-          key: ${{ runner.os }}-${{ runner.arch }}-build-${{ env.cache-name }}-${{ hashFiles('**/*.cabal') }}-${{ hashFiles('**/cabal.project') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
-      - name: Install dependencies
+      - name: Get Cabal version
+        id: cabal
         run: |
-          cabal update
-          cabal build --only-dependencies --enable-tests --enable-benchmarks
+          echo "version=$(cabal --numeric-version)" >> "$GITHUB_OUTPUT"
+          # there doesn't seem to be a way to ask cabal what the store path is
+          echo "store=~/.cache/cabal/store" >> "$GITHUB_OUTPUT"
+      - name: Configure the build
+        run: |
+          cabal configure --enable-tests --enable-benchmarks --disable-documentation
+          cabal build --dry-run
+      - name: Restore cached dependencies
+        uses: buildjet/cache/restore@v3
+        id: cache
+        env:
+          key: ${{ runner.os }}-${{ runner.arch }}-ghc-${{ matrix.ghc }}-cabal-${{ steps.cabal.outputs.version }}
+        with:
+          path: ${{ steps.cabal.outputs.store }}
+          key: ${{ env.key }}-plan-${{ hashFiles('**/plan.json') }}
+          restore-keys: ${{ env.key }}-
+      - name: Install dependencies
+        run: cabal build all --only-dependencies
+      - name: Save cached dependencies
+        uses: buildjet/cache/save@v3
+        # Caches are immutable, trying to save with the same key would error.
+        if: ${{ steps.cache.outputs.cache-primary-key != steps.cache.outputs.cache-matched-key }}
+        with:
+          path: ${{ steps.cabal.outputs.store }}
+          key: ${{ steps.cache.outputs.cache-primary-key }}
       - name: Build
         run: cabal build --enable-tests --enable-benchmarks all
       - name: Check the executable runs
