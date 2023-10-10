@@ -8,7 +8,6 @@ module Klondike
     , newGame
     ) where
 
-import Data.Maybe (fromJust)
 import Data.Vector qualified as Unsized
 import Data.Vector.Sized qualified as Sized
 
@@ -51,17 +50,11 @@ newGame deck =
 
 genTableau :: Deck -> (Stock, Tableau)
 genTableau (Deck cards) =
-    let counts = [1 .. 7]
-        (rest, columns) =
-            foldr
-                ( \n (cards', columns') ->
-                    let (column, rest') = splitAt n cards'
-                     in (rest', column : columns')
-                )
-                (Sized.toList cards, mempty)
-                counts
-        -- fixme: figure out how to do this with sized vectors
-        trustMeBro = fromJust $ Sized.fromList columns
-        tableau = Unsized.fromList <$> trustMeBro
-        stock = Unsized.fromList rest
-     in (Stock stock, Tableau tableau)
+    let cards' = Sized.fromSized cards
+        tableau = Sized.generate \n ->
+            let withoutPrevCols = Unsized.drop (sum [0 .. fromIntegral n]) cards'
+             in Unsized.take (fromIntegral n + 1) withoutPrevCols
+        stock :: Sized.Vector 24 Card = Sized.drop cards
+     in ( Stock $ Sized.fromSized stock
+        , Tableau tableau
+        )
