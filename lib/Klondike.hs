@@ -5,6 +5,7 @@ module Klondike
     , Foundations (..)
     , Klondike (..)
     , newGame
+    , turn
     ) where
 
 import Data.Vector qualified as Unsized
@@ -24,6 +25,30 @@ newtype Waste n = Waste (Pile n)
 newtype Foundations = Foundations (Sized.Vector 4 UnsizedPile)
     deriving stock (Show)
     deriving newtype (Semigroup, Monoid)
+
+data Move
+    = TurnStock
+    | MoveWasteTableau
+    | MoveWasteFoundation
+    | MoveTableauFoundation
+    | MoveFoundationTableau
+    | MoveTableauTableau
+    deriving (Show)
+
+turn :: Klondike s w -> Move -> Klondike s' w'
+turn k = \case
+    TurnStock ->
+        _turnStock
+    MoveWasteTableau ->
+        _moveWasteTableau
+    MoveWasteFoundation ->
+        _moveWasteFoundation
+    MoveTableauFoundation ->
+        _moveTableauFoundation
+    MoveFoundationTableau ->
+        _moveFoundationTableau
+    MoveTableauTableau ->
+        _moveTableauTableau
 
 -- | @t'Klondike' s w@ is a game of Klondike where @s@ is the current size of the stock and @w@ is the current size of the waste.
 data Klondike s w = Klondike
