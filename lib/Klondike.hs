@@ -25,6 +25,8 @@ newtype Foundations = Foundations (Sized.Vector 4 UnsizedPile)
     deriving stock (Show)
     deriving newtype (Semigroup, Monoid)
 
+-- todo: rename Game to Klondike?
+
 -- | @t'Game' s w@ is a game of Klondike where @s@ is the current size of the stock and @w@ is the current size of the waste.
 data Game s w = Game
     { tableau :: Tableau
