@@ -13,48 +13,45 @@ import Data.Vector.Sized qualified as Sized
 
 import Cards (Card, Deck (..))
 
-type Pile = Unsized.Vector Card
+type Pile n = Sized.Vector n Card
+type UnsizedPile = Unsized.Vector Card
 
-newtype Tableau = Tableau (Sized.Vector 7 Pile)
+newtype Tableau = Tableau (Sized.Vector 7 UnsizedPile)
     deriving (Show)
 
-newtype Stock = Stock Pile
+newtype Stock n = Stock (Pile n)
     deriving (Show)
-    deriving newtype (Semigroup, Monoid)
 
-newtype Waste = Waste Pile
+newtype Waste n = Waste (Pile n)
     deriving (Show)
-    deriving newtype (Semigroup, Monoid)
 
-newtype Foundations = Foundations (Sized.Vector 4 Pile)
+newtype Foundations = Foundations (Sized.Vector 4 UnsizedPile)
     deriving stock (Show)
     deriving newtype (Semigroup, Monoid)
 
-data Game = Game
+data Game s w = Game
     { tableau :: Tableau
-    , stock :: Stock
-    , waste :: Waste
+    , stock :: Stock s
+    , waste :: Waste w
     , foundations :: Foundations
     }
     deriving (Show)
 
-newGame :: Deck -> Game
+newGame :: Deck -> Game 24 0
 newGame deck =
     let (stock, tableau) = genTableau deck
      in Game
-            { waste = mempty
+            { waste = Waste Sized.empty
             , foundations = mempty
             , stock
             , tableau
             }
 
-genTableau :: Deck -> (Stock, Tableau)
+genTableau :: Deck -> (Stock 24, Tableau)
 genTableau (Deck cards) =
     let cards' = Sized.fromSized cards
-        tableau = Sized.generate \n ->
+     in ( Stock $ Sized.drop cards
+        , Tableau $ Sized.generate \n ->
             let withoutPrevCols = Unsized.drop (sum [0 .. fromIntegral n]) cards'
              in Unsized.take (fromIntegral n + 1) withoutPrevCols
-        stock :: Sized.Vector 24 Card = Sized.drop cards
-     in ( Stock $ Sized.fromSized stock
-        , Tableau tableau
         )
