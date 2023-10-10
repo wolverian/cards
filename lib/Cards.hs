@@ -30,10 +30,10 @@ data Suit = Diamond | Clubs | Hearts | Spades
 instance Show Suit where
     show :: Suit -> String
     show = \case
-        Diamond -> "♦"
-        Clubs -> "♣"
-        Hearts -> "♥"
-        Spades -> "♠"
+        Diamond -> "♦️"
+        Clubs -> "♣️"
+        Hearts -> "♥️"
+        Spades -> "♠️"
 
 data Rank = Ace | Two | Three | Four | Five | Six | Seven | Eight | Nine | Ten | Jack | Queen | King
     deriving (Read, Eq, Ord, Enum, Bounded, Generic)

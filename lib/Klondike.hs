@@ -3,7 +3,7 @@ module Klondike
     , Stock (..)
     , Waste (..)
     , Foundations (..)
-    , Game (..)
+    , Klondike (..)
     , newGame
     ) where
 
@@ -27,8 +27,8 @@ newtype Foundations = Foundations (Sized.Vector 4 UnsizedPile)
 
 -- todo: rename Game to Klondike?
 
--- | @t'Game' s w@ is a game of Klondike where @s@ is the current size of the stock and @w@ is the current size of the waste.
-data Game s w = Game
+-- | @t'Klondike' s w@ is a game of Klondike where @s@ is the current size of the stock and @w@ is the current size of the waste.
+data Klondike s w = Klondike
     { tableau :: Tableau
     , stock :: Stock s
     , waste :: Waste w
@@ -36,10 +36,10 @@ data Game s w = Game
     }
     deriving (Show)
 
-newGame :: Deck -> Game 24 0
+newGame :: Deck -> Klondike 24 0
 newGame deck =
     let (stock, tableau) = genTableau deck
-     in Game
+     in Klondike
             { waste = Waste Sized.empty
             , foundations = mempty
             , stock
