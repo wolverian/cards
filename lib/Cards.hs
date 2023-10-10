@@ -6,6 +6,8 @@ module Cards
     , value
     , Card (..)
     , Deck (..)
+    , Pile
+    , UnsizedPile
     , regularDeck
     , Hand (..)
     , shuffledDeck
@@ -15,6 +17,7 @@ module Cards
     ) where
 
 import Data.Maybe (fromJust)
+import Data.Vector qualified as Unsized
 import Data.Vector.Sized qualified as Sized
 import GHC.Generics (Generic)
 import GHC.TypeLits (KnownNat)
@@ -50,11 +53,11 @@ instance Show Card where
     show :: Card -> String
     show (Card suit rank) = show suit ++ " " ++ show rank
 
-newtype Deck = Deck (Sized.Vector 52 Card)
+newtype Deck = Deck (Pile 52)
     deriving (Show, Read, Eq, Generic)
 
-newtype Pile n = Pile (Sized.Vector n Card)
-    deriving (Show, Read, Eq, Generic)
+type Pile n = Sized.Vector n Card
+type UnsizedPile = Unsized.Vector Card
 
 regularDeck :: Deck
 regularDeck = Deck $ Sized.concatMap cardsOfSuit suits
@@ -77,13 +80,12 @@ newtype Hand n = Hand (Sized.Vector n Card)
 shuffledDeck :: (RandomGen g) => g -> Deck
 shuffledDeck g =
     let Deck cards = regularDeck
-        Pile cards' = shuffle (Pile cards) g
+        cards' = shuffle cards g
      in Deck cards'
 
 shuffle :: (RandomGen g, KnownNat n) => Pile n -> g -> Pile n
-shuffle (Pile cards) =
+shuffle cards =
     -- todo: write a shuffle for sized vectors to get rid of this mess and random-shuffle
-    Pile
-        . fromJust
+    fromJust
         . Sized.fromList
         . Random.shuffle' (Sized.toList cards) (length cards)

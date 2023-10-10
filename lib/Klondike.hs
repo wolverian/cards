@@ -1,6 +1,5 @@
 module Klondike
-    ( Pile
-    , Tableau (..)
+    ( Tableau (..)
     , Stock (..)
     , Waste (..)
     , Foundations (..)
@@ -11,10 +10,7 @@ module Klondike
 import Data.Vector qualified as Unsized
 import Data.Vector.Sized qualified as Sized
 
-import Cards (Card, Deck (..))
-
-type Pile n = Sized.Vector n Card
-type UnsizedPile = Unsized.Vector Card
+import Cards (Deck (..), Pile, UnsizedPile)
 
 newtype Tableau = Tableau (Sized.Vector 7 UnsizedPile)
     deriving (Show)
@@ -29,6 +25,7 @@ newtype Foundations = Foundations (Sized.Vector 4 UnsizedPile)
     deriving stock (Show)
     deriving newtype (Semigroup, Monoid)
 
+-- | @t'Game' s w@ is a game of Klondike where @s@ is the current size of the stock and @w@ is the current size of the waste.
 data Game s w = Game
     { tableau :: Tableau
     , stock :: Stock s
