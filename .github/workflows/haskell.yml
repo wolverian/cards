@@ -25,13 +25,21 @@ jobs:
       image: ghcr.io/wolverian/ghc-musl:${{ matrix.ghc }}
     steps:
       - uses: actions/checkout@v3
-      - name: Cache
+      - name: Cache .cabal store
         uses: buildjet/cache@v3
         env:
           key: ${{ runner.os }}-${{ runner.arch }}-ghc-${{ matrix.ghc }}-cabal
         with:
           path: ~/.cache/cabal
           key: ${{ env.key }}-${{ hashFiles('*.cabal', 'cabal.project', 'cabal.project.freeze') }}
+          restore-keys: ${{ env.key }}-
+      - name: Cache project build directory
+        uses: buildjet/cache@v3
+        env:
+          key: ${{ runner.os }}-${{ runner.arch }}-ghc-${{ matrix.ghc }}-dist
+        with:
+          path: ./dist-newstyle
+          key: ${{ env.key }}-${{ hashFiles('**/*.hs', '*.cabal', 'cabal.project', 'cabal.project.freeze') }}
           restore-keys: ${{ env.key }}-
       - name: Install dependencies
         run: |
