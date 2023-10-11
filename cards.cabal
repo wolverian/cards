@@ -19,6 +19,8 @@ common settings
     DerivingStrategies
     ExplicitNamespaces
     LambdaCase
+    OverloadedRecordDot
+    TypeFamilies
     ViewPatterns
 
 common dependencies
