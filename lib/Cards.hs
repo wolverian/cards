@@ -16,6 +16,7 @@ module Cards
     , cardsOfSuit
     ) where
 
+import Data.Function ((&))
 import Data.Maybe (fromJust)
 import Data.Vector qualified as Unsized
 import Data.Vector.Sized qualified as Sized
@@ -84,8 +85,15 @@ shuffledDeck g =
      in Deck cards'
 
 shuffle :: (RandomGen g, KnownNat n) => Pile n -> g -> Pile n
-shuffle cards =
-    -- todo: write a shuffle for sized vectors to get rid of this mess and random-shuffle
-    fromJust
-        . Sized.fromList
-        . Random.shuffle' (Sized.toList cards) (length cards)
+shuffle cards g =
+    Random.shuffle' (Sized.toList cards) (length cards) g
+        |> Sized.fromList
+        |> fromJust
+
+-- todo: write a shuffle for sized vectors to get rid of this mess and random-shuffle
+-- fromJust
+--     . Sized.fromList
+--     . Random.shuffle' (Sized.toList cards) (length cards)
+
+(|>) :: a -> (a -> b) -> b
+(|>) = (&)

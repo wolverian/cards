@@ -11,6 +11,7 @@ import Data.Vector qualified as Unsized
 import Data.Vector.Sized qualified as Sized
 
 import Cards (Deck (..), Pile, UnsizedPile)
+import Data.Function ((&))
 
 newtype Tableau = Tableau (Sized.Vector 7 UnsizedPile)
     deriving (Show)
@@ -46,9 +47,13 @@ newGame deck =
 
 genTableau :: Deck -> (Stock 24, Tableau)
 genTableau (Deck cards) =
-    let cards' = Sized.fromSized cards
-     in ( Stock $ Sized.drop cards
-        , Tableau $ Sized.generate \n ->
-            let withoutPrevCols = Unsized.drop (sum [0 .. fromIntegral n]) cards'
-             in Unsized.take (fromIntegral n + 1) withoutPrevCols
-        )
+    ( Stock $ Sized.drop cards
+    , Tableau $ Sized.generate \(fromIntegral -> n) ->
+        cards
+            |> Sized.fromSized
+            |> Unsized.drop (sum [0 .. n])
+            |> Unsized.take (n + 1)
+    )
+
+(|>) :: a -> (a -> b) -> b
+(|>) = (&)
